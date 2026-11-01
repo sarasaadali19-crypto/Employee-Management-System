@@ -1,0 +1,101 @@
+#include <iostream>
+#include <string>
+#include <iomanip>
+using namespace std;
+class Employee {
+private:
+    int id;
+    string name;
+    double basicSalary;
+protected:
+    double getBasicSalary() const {
+        return basicSalary;
+    }
+public:
+    Employee(int employeeId, const string& employeeName, double salary)
+        : id(employeeId), name(employeeName), basicSalary(salary) {}
+    virtual ~Employee() {}
+    int getId() const {
+        return id;
+    }
+    string getName() const {
+        return name;
+    }
+    void setName(const string& employeeName) {
+        name = employeeName;
+    }
+    void setBasicSalary(double salary) {
+        if (salary >= 0)
+            basicSalary = salary;
+    }
+    virtual double calculateSalary() const {
+        return basicSalary;
+    }
+    double calculateSalary(double bonus) const {
+        return basicSalary + bonus;
+    }
+    virtual void display() const {
+        cout << "Employee ID: " << id << '\n';
+        cout << "Employee Name: " << name << '\n';
+        cout << "Basic Salary: " << fixed
+             << setprecision(2) << basicSalary << '\n';
+    }
+};
+class FullTimeEmployee : public Employee {
+private:
+    double monthlyAllowance;
+public:
+    FullTimeEmployee(int employeeId, const string& employeeName,
+                     double salary, double allowance)
+        : Employee(employeeId, employeeName, salary),
+          monthlyAllowance(allowance) {}
+    ~FullTimeEmployee() override {}
+    double calculateSalary() const override {
+        return getBasicSalary() + monthlyAllowance;
+    }
+    void display() const override {
+        Employee::display();
+        cout << "Monthly Allowance: " << fixed
+             << setprecision(2) << monthlyAllowance << '\n';
+        cout << "Total Salary: " << calculateSalary() << '\n';
+    }
+};
+int main() {
+    int id;
+    string name;
+    double basicSalary, allowance, bonus;
+    cout << "=== Employee Management System ===\n";
+    cout << "Enter employee ID: ";
+    if (!(cin >> id)) {
+        cout << "Invalid employee ID.\n";
+        return 1;
+    }
+    cin.ignore(10000, '\n');
+    cout << "Enter employee name: ";
+    getline(cin, name);
+    cout << "Enter basic salary: ";
+    if (!(cin >> basicSalary) || basicSalary < 0) {
+        cout << "Invalid salary.\n";
+        return 1;
+    }
+    cout << "Enter monthly allowance: ";
+    if (!(cin >> allowance) || allowance < 0) {
+        cout << "Invalid allowance.\n";
+        return 1;
+    }
+    FullTimeEmployee employee(id, name, basicSalary, allowance);
+    cout << "\n=== Employee Details ===\n";
+    employee.display();
+    cout << "\nEnter bonus: ";
+    if (!(cin >> bonus) || bonus < 0) {
+        cout << "Invalid bonus.\n";
+        return 1;
+    }
+    cout << "Salary including bonus: "
+         << fixed << setprecision(2)
+         << employee.calculateSalary(bonus) << '\n';
+    cout << "\n=== Polymorphism Demonstration ===\n";
+    Employee* employeePointer = &employee;
+    employeePointer->display();
+    return 0;
+}
